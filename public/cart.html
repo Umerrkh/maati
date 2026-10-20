@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cart · Maati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css"></head><body>
+<main class="wrap"><section><h2>Your cart</h2><div id="box"></div></section></main>
+<script src="/app.js"></script><script>let P=[];
+async function init(){P=(await api("/api/products")).data;draw()}
+function draw(){const c=cart.get(),ids=Object.keys(c).filter(i=>c[i]>0),b=$("#box");
+if(!ids.length){b.innerHTML=`<div class="empty"><p>Your cart is empty.</p><a class="btn" href="/shop.html">Browse the shop</a></div>`;return}
+let t=0;b.innerHTML=`<div class="cartlist">`+ids.map(i=>{const p=P.find(x=>x.id==i);t+=p.price*c[i];
+return `<div class="item" style="--c:${p.color}"><div class="pic"></div><div><b>${p.name}</b><br><small>${fmt(p.price)}</small></div>
+<div class="qty"><button data-d="-1" data-i="${i}" aria-label="Fewer">−</button><span>${c[i]}</span><button data-d="1" data-i="${i}" aria-label="More">+</button></div><b>${fmt(p.price*c[i])}</b></div>`}).join("")+
+`</div><div class="total"><span>Total ${fmt(t)}</span><button class="btn" id="buy">Place order</button></div><p class="msg" id="m"></p>`;
+b.onclick=e=>{const{i,d}=e.target.dataset;if(i){const c=cart.get();c[i]=Math.max(0,c[i]+ +d);cart.set(c);draw()}
+if(e.target.id==="buy"){if(!user){location.href="/auth.html?next=cart";return}cart.set({});b.innerHTML=`<div class="empty"><h3>Order placed, ${user.name.split(" ")[0]}.</h3><p>Thank you. We will email you when it ships.</p><a class="btn" href="/shop.html">Keep shopping</a></div>`}}}</script></body></html>

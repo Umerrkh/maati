@@ -1,0 +1,6 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shop · Maati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css"></head><body>
+<main class="wrap"><section><h2>All ceramics</h2><p class="sub">Prices in Pakistani rupees. Free delivery over Rs 5,000.</p><div class="grid" id="all"></div></section></main>
+<script src="/app.js"></script><script>async function init(){const{data}=await api("/api/products");const g=$("#all");g.innerHTML=data.map(card).join("");bindAdd(g)}</script></body></html>

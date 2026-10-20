@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Handmade ceramics · Maati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css"></head><body>
+<main class="wrap">
+<div class="hero"><div><h1>Tableware made slowly, by hand.</h1>
+<p>Bowls, mugs and vases thrown and glazed in small batches, so every piece on your table is a little different.</p>
+<div class="row"><a class="btn" href="/shop.html">Shop ceramics</a><a class="btn ghost" href="/auth.html">Create an account</a></div></div>
+<div class="shelf" aria-hidden="true"><i style="--c:#2F5D8A;height:150px"></i><i style="--c:#7C9885;height:230px"></i><i style="--c:#A5604A;height:180px"></i></div></div>
+<section><h2>New this month</h2><p class="sub">Four pieces from the latest firing.</p><div class="grid" id="feat"></div></section>
+<section class="values"><div><h3>Made in small batches</h3><p>Each firing makes fewer than 60 pieces.</p></div>
+<div><h3>Packed to survive the road</h3><p>Double-boxed and insured to your door.</p></div>
+<div><h3>Easy returns</h3><p>Not happy within 14 days? Send it back.</p></div></section></main>
+<script src="/app.js"></script><script>async function init(){const{data}=await api("/api/products");const g=$("#feat");g.innerHTML=data.slice(0,4).map(card).join("");bindAdd(g)}</script></body></html>

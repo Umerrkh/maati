@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in · Maati</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css"></head><body>
+<main class="wrap"><div class="auth"><h2>Welcome to Maati</h2>
+<div class="tabs"><button class="on" data-m="login">Sign in</button><button data-m="signup">Create account</button></div>
+<div id="nameBox" hidden><label for="name">Full name</label><input id="name" autocomplete="name"></div>
+<label for="email">Email</label><input id="email" type="email" autocomplete="email">
+<label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="At least 8 characters">
+<button class="btn" id="go">Sign in</button><p class="msg" id="m" role="alert"></p></div></main>
+<script src="/app.js"></script><script>let mode="login";
+function init(){if(user)location.href="/shop.html";
+document.querySelector(".tabs").onclick=e=>{const m=e.target.dataset.m;if(!m)return;mode=m;
+document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+$("#nameBox").hidden=m==="login";$("#go").textContent=m==="login"?"Sign in":"Create account";$("#m").textContent=""};
+$("#go").onclick=async()=>{const m=$("#m");m.className="msg";
+const body={email:$("#email").value,password:$("#pw").value};if(mode==="signup")body.name=$("#name").value;
+const r=await api("/api/"+mode,body);
+if(!r.ok){m.className="msg err";m.textContent=r.data.error||"Something went wrong. Try again.";return}
+location.href=new URLSearchParams(location.search).get("next")==="cart"?"/cart.html":"/shop.html"}}</script></body></html>
