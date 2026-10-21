@@ -1,20 +1,138 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sign in · Maati</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css"></head><body>
-<main class="wrap"><div class="auth"><h2>Welcome to Maati</h2>
-<div class="tabs"><button class="on" data-m="login">Sign in</button><button data-m="signup">Create account</button></div>
-<div id="nameBox" hidden><label for="name">Full name</label><input id="name" autocomplete="name"></div>
-<label for="email">Email</label><input id="email" type="email" autocomplete="email">
-<label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="At least 8 characters">
-<button class="btn" id="go">Sign in</button><p class="msg" id="m" role="alert"></p></div></main>
-<script src="/app.js"></script><script>let mode="login";
-function init(){if(user)location.href="/shop.html";
-document.querySelector(".tabs").onclick=e=>{const m=e.target.dataset.m;if(!m)return;mode=m;
-document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
-$("#nameBox").hidden=m==="login";$("#go").textContent=m==="login"?"Sign in":"Create account";$("#m").textContent=""};
-$("#go").onclick=async()=>{const m=$("#m");m.className="msg";
-const body={email:$("#email").value,password:$("#pw").value};if(mode==="signup")body.name=$("#name").value;
-const r=await api("/api/"+mode,body);
-if(!r.ok){m.className="msg err";m.textContent=r.data.error||"Something went wrong. Try again.";return}
-location.href=new URLSearchParams(location.search).get("next")==="cart"?"/cart.html":"/shop.html"}}</script></body></html>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1d2a21;--soft:#5d6b60;--bg:#e6eadf;--card:#fbfbf7;--line:#cfd6c8;--gold:#d9951b;--gold-d:#b87a0e;--err:#b3261e;--r1:#2f4637;--r2:#3f5c49;--r3:#587a63}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:Figtree,system-ui,sans-serif;color:var(--ink);background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* Strata: three soil layers drifting at different speeds — the one ambient motion */
+.strata{position:fixed;inset:auto 0 0 0;height:46vh;pointer-events:none;z-index:0}
+.strata svg{position:absolute;bottom:0;left:0;width:200%;height:100%}
+.strata .l1{animation:drift 60s linear infinite;opacity:.55}
+.strata .l2{animation:drift 42s linear infinite reverse;opacity:.75}
+.strata .l3{animation:drift 28s linear infinite}
+@keyframes drift{to{transform:translateX(-50%)}}
+
+.wrap{position:relative;z-index:1;min-height:100%;display:grid;place-items:center;padding:24px 16px 40px}
+.auth{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px 28px 28px;box-shadow:0 1px 0 #fff inset,0 24px 48px -24px rgba(29,42,33,.35);animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:none}}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.seed{width:28px;height:28px;flex:none}
+.seed path{stroke-dasharray:60;stroke-dashoffset:60;animation:draw 1s .5s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.brand b{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:1.15rem}
+h2{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:1.75rem;line-height:1.15;margin:14px 0 4px}
+.sub{margin:0 0 22px;color:var(--soft);font-size:.95rem;min-height:1.4em}
+
+.tabs{position:relative;display:grid;grid-template-columns:1fr 1fr;background:#eef0e8;border-radius:12px;padding:4px;margin-bottom:20px}
+.tabs::before{content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--card);border-radius:9px;box-shadow:0 1px 3px rgba(29,42,33,.18);transition:transform .35s cubic-bezier(.5,1.4,.5,1)}
+.tabs[data-mode=signup]::before{transform:translateX(100%)}
+.tabs button{position:relative;border:0;background:none;font:inherit;font-weight:600;font-size:.92rem;padding:10px;color:var(--soft);cursor:pointer;border-radius:9px;transition:color .25s}
+.tabs button.on{color:var(--ink)}
+
+label{display:block;font-size:.85rem;font-weight:600;margin:14px 0 6px}
+input{width:100%;font:inherit;font-size:1rem;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;transition:border-color .2s,box-shadow .2s}
+input::placeholder{color:#9aa59c}
+input:hover{border-color:#b6c0b2}
+input:focus{outline:none;border-color:var(--r3);box-shadow:0 0 0 4px rgba(88,122,99,.18)}
+#nameBox:not([hidden]){animation:unfold .4s cubic-bezier(.2,.8,.2,1) both;transform-origin:top}
+@keyframes unfold{from{opacity:0;transform:translateY(-8px) scaleY(.85)}to{opacity:1;transform:none}}
+.pwrow{position:relative}
+.pwrow input{padding-right:64px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;font:inherit;font-size:.82rem;font-weight:600;color:var(--soft);padding:8px 10px;border-radius:8px;cursor:pointer}
+.eye:hover{color:var(--ink);background:#eef0e8}
+
+.btn{position:relative;width:100%;margin-top:22px;border:0;border-radius:12px;padding:14px;font:inherit;font-weight:600;font-size:1rem;color:#fff;background:var(--r1);cursor:pointer;overflow:hidden;transition:transform .15s,background .25s,box-shadow .25s;box-shadow:0 8px 18px -8px rgba(47,70,55,.7)}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-120%);transition:transform .6s}
+.btn:hover{background:var(--r2)}
+.btn:hover::after{transform:translateX(120%)}
+.btn:active{transform:scale(.98)}
+.btn:focus-visible,.tabs button:focus-visible,.eye:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.btn.busy{pointer-events:none;color:transparent}
+.btn.busy::before{content:"";position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.msg{min-height:1.3em;margin:14px 0 0;font-size:.9rem;text-align:center}
+.msg.err{color:var(--err);animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.auth.shake{animation:shake .45s}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style></head><body>
+
+<div class="strata" aria-hidden="true">
+  <svg class="l1" viewBox="0 0 1600 300" preserveAspectRatio="none"><path fill="#587a63" d="M0 120 C200 60 400 180 800 120 S1400 60 1600 120 V300 H0Z"/></svg>
+  <svg class="l2" viewBox="0 0 1600 300" preserveAspectRatio="none"><path fill="#3f5c49" d="M0 170 C250 110 450 230 800 170 S1350 110 1600 170 V300 H0Z"/></svg>
+  <svg class="l3" viewBox="0 0 1600 300" preserveAspectRatio="none"><path fill="#2f4637" d="M0 220 C300 170 500 270 800 220 S1300 170 1600 220 V300 H0Z"/></svg>
+</div>
+
+<main class="wrap"><div class="auth" id="card">
+  <div class="brand">
+    <svg class="seed" viewBox="0 0 28 28" fill="none" stroke="#d9951b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 25V13M14 13C14 7 9 4 4 4c0 6 3 9 10 9ZM14 16c0-4 3-7 10-7 0 5-3 7-10 7Z"/></svg>
+    <b>Maati</b>
+  </div>
+  <h2 id="title">Welcome back</h2>
+  <p class="sub" id="sub">Sign in to pick up where you left off.</p>
+
+  <div class="tabs" data-mode="login"><button class="on" data-m="login" type="button">Sign in</button><button data-m="signup" type="button">Create account</button></div>
+
+  <div id="nameBox" hidden><label for="name">Full name</label><input id="name" autocomplete="name"></div>
+  <label for="email">Email</label><input id="email" type="email" autocomplete="email">
+  <label for="pw">Password</label>
+  <div class="pwrow"><input id="pw" type="password" autocomplete="current-password" placeholder="At least 8 characters"><button class="eye" id="eye" type="button" aria-label="Show password">Show</button></div>
+  <button class="btn" id="go">Sign in</button>
+  <p class="msg" id="m" role="alert"></p>
+</div></main>
+
+<script src="/app.js"></script>
+<script>
+let mode="login";
+const COPY={login:["Welcome back","Sign in to pick up where you left off."],signup:["Join Maati","Create an account to save your cart and orders."]};
+function init(){
+  if(user)location.href="/shop.html";
+
+  const tabs=document.querySelector(".tabs");
+  tabs.onclick=e=>{
+    const m=e.target.dataset.m;if(!m||m===mode)return;mode=m;
+    tabs.dataset.mode=m;
+    tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+    $("#nameBox").hidden=m==="login";
+    $("#pw").autocomplete=m==="login"?"current-password":"new-password";
+    $("#go").textContent=m==="login"?"Sign in":"Create account";
+    $("#title").textContent=COPY[m][0];$("#sub").textContent=COPY[m][1];
+    $("#m").textContent="";$("#m").className="msg";
+  };
+
+  $("#eye").onclick=()=>{
+    const p=$("#pw"),show=p.type==="password";
+    p.type=show?"text":"password";
+    $("#eye").textContent=show?"Hide":"Show";
+    $("#eye").setAttribute("aria-label",show?"Hide password":"Show password");
+  };
+
+  document.querySelectorAll("input").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")$("#go").click()}));
+
+  $("#go").onclick=async()=>{
+    const m=$("#m"),btn=$("#go"),card=$("#card");m.className="msg";m.textContent="";
+    const body={email:$("#email").value,password:$("#pw").value};
+    if(mode==="signup")body.name=$("#name").value;
+    btn.classList.add("busy");
+    let r;
+    try{r=await api("/api/"+mode,body)}catch(_){r={ok:false,data:{}}}
+    btn.classList.remove("busy");
+    if(!r.ok){
+      m.className="msg err";m.textContent=r.data.error||"Something went wrong. Try again.";
+      card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake");
+      return;
+    }
+    location.href=new URLSearchParams(location.search).get("next")==="cart"?"/cart.html":"/shop.html";
+  };
+}
+</script>
+</body></html>
