@@ -1,8 +1,8 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cart · Maati</title>
+<title>Your Cart · Maati</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/style.css"></head><body>
-<main class="wrap"><section><h2>Your cart</h2><div id="box"></div></section></main>
+<main class="wrap"><section><h2>Your cart 🛒</h2><p style="color:#2e7d32;font-size:14px;margin:0 0 12px">Free delivery on orders over $50 (CI/CD test)</p><div id="box"></div></section></main>
 <script src="/app.js"></script><script>let P=[];
 async function init(){P=(await api("/api/products")).data;draw()}
 function draw(){const c=cart.get(),ids=Object.keys(c).filter(i=>c[i]>0),b=$("#box");
