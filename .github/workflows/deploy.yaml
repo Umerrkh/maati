@@ -15,5 +15,5 @@ jobs:
       - name: Build and deploy with Docker Compose
         run: docker compose up -d --build
 
-      - name: Clean up old images
-        run: docker image prune -f
+      #- name: Clean up old images
+        #run: docker image prune -f
