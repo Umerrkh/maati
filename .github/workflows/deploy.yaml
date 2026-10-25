@@ -1,17 +1,24 @@
-
-name: Nodejs CI/CD
+name: Maati CI/CD
 
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: self-hosted
 
     steps:
-      - name: Deploy application
+      - name: Deploy Maati
         run: |
           cd /opt/maati
           docker compose up -d --build
+
+      - name: Verify deployment
+        run: |
+          cd /opt/maati
+          docker compose ps
+          curl -fsS http://127.0.0.1:3000
+
 
