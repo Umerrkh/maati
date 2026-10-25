@@ -2,7 +2,7 @@ name: Nodejs CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   deploy:
@@ -12,8 +12,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Build and deploy with Docker Compose
+      - name: Check deployment environment
+        run: |
+          whoami
+          pwd
+          ls -la
+          docker ps
+          docker compose version
+
+      - name: Build and deploy
         run: docker compose up -d --build
+
 
       #- name: Clean up old images
         #run: docker image prune -f
