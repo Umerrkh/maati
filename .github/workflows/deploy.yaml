@@ -10,15 +10,11 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Deploy Maati
-        run: |
-          cd /opt/maati
-          docker compose up -d --build
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Verify deployment
-        run: |
-          cd /opt/maati
-          docker compose ps
-          curl -fsS http://127.0.0.1:3000
+      - name: Deploy Maati
+        run: docker compose up -d --build
+
 
 
