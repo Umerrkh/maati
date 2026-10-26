@@ -17,12 +17,8 @@ jobs:
       - name: Deploy Maati
         run: |
           cd /opt/maati
-          echo "=== Current directory ==="
           pwd
-          echo "=== Compose configuration ==="
           docker compose config
-          echo "=== Deploying ==="
-          docker compose up -d --build --force-recreate
-          docker compose ps
+          docker compose up -d --build
 
 
