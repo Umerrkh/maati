@@ -3,12 +3,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#1d2a21;--soft:#5d6b60;--bg:#e6eadf;--card:#fbfbf7;--line:#cfd6c8;--gold:#d9951b;--gold-d:#b87a0e;--err:#b3261e;--r1:#2f4637;--r2:#3f5c49;--r3:#587a63}
+:root{--ink:#1d2a21;--soft:#5d6b60;--bg:#e6eadf;--card:#fbfbf7;--line:#cfd6c8;--gold:#d9951b;--gold-d:#b87a0e;--err:#b3261e;--r1:#2f4637;--r2:#3f5c49;--r3:#587a63;--e:cubic-bezier(.2,.8,.2,1)}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{font-family:Figtree,system-ui,sans-serif;color:var(--ink);background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-/* Strata: three soil layers drifting at different speeds — the one ambient motion */
+/* sun glow */
+.sun{position:fixed;top:-140px;right:-100px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(217,149,27,.5),transparent 65%);pointer-events:none;z-index:0;animation:sun 7s ease-in-out infinite alternate}
+@keyframes sun{from{transform:scale(.9);opacity:.6}to{transform:scale(1.15);opacity:1}}
+
+/* strata */
 .strata{position:fixed;inset:auto 0 0 0;height:46vh;pointer-events:none;z-index:0}
 .strata svg{position:absolute;bottom:0;left:0;width:200%;height:100%}
 .strata .l1{animation:drift 60s linear infinite;opacity:.55}
@@ -16,36 +20,70 @@ body{font-family:Figtree,system-ui,sans-serif;color:var(--ink);background:var(--
 .strata .l3{animation:drift 28s linear infinite}
 @keyframes drift{to{transform:translateX(-50%)}}
 
-.wrap{position:relative;z-index:1;min-height:100%;display:grid;place-items:center;padding:24px 16px 40px}
-.auth{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px 28px 28px;box-shadow:0 1px 0 #fff inset,0 24px 48px -24px rgba(29,42,33,.35);animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+/* floating leaves */
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.leaf{position:absolute;bottom:-24px;left:var(--l);width:var(--s);height:var(--s);background:var(--c);border-radius:0 100% 0 100%;opacity:0;animation:floatup var(--d) linear var(--dl) infinite}
+@keyframes floatup{
+  0%{transform:translate(0,0) rotate(0);opacity:0}
+  10%{opacity:.55}
+  50%{transform:translate(var(--dx),-55vh) rotate(180deg)}
+  90%{opacity:.55}
+  100%{transform:translate(calc(var(--dx)*-1),-115vh) rotate(360deg);opacity:0}}
+
+.wrap{position:relative;z-index:1;min-height:100%;display:grid;place-items:center;padding:24px 16px 40px;perspective:1000px}
+.tilt{width:100%;max-width:400px;transition:transform .25s ease-out}
+
+.auth{position:relative;width:100%;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px 28px 28px;box-shadow:0 1px 0 #fff inset,0 24px 48px -24px rgba(29,42,33,.35);animation:rise .7s var(--e) both}
 @keyframes rise{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:none}}
+.auth::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%),rgba(217,149,27,.15),transparent 70%);opacity:0;transition:opacity .4s;pointer-events:none}
+.auth:hover::before{opacity:1}
+.auth>*{animation:fieldIn .6s var(--e) calc(.25s + var(--i,0)*60ms) backwards}
+@keyframes fieldIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.auth.leave{animation:leave .6s ease forwards}
+@keyframes leave{to{opacity:0;transform:translateY(-30px) scale(.96)}}
+
 .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.seed{width:28px;height:28px;flex:none}
+.seed{width:28px;height:28px;flex:none;transform-origin:50% 100%;animation:sway 4s ease-in-out 1.6s infinite}
+@keyframes sway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg)}}
 .seed path{stroke-dasharray:60;stroke-dashoffset:60;animation:draw 1s .5s ease forwards}
 @keyframes draw{to{stroke-dashoffset:0}}
 .brand b{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:1.15rem}
 h2{font-family:"Young Serif",Georgia,serif;font-weight:400;font-size:1.75rem;line-height:1.15;margin:14px 0 4px}
 .sub{margin:0 0 22px;color:var(--soft);font-size:.95rem;min-height:1.4em}
+.swap{animation:swap .45s var(--e)!important}
+@keyframes swap{from{opacity:0;transform:translateY(8px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
 
 .tabs{position:relative;display:grid;grid-template-columns:1fr 1fr;background:#eef0e8;border-radius:12px;padding:4px;margin-bottom:20px}
 .tabs::before{content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--card);border-radius:9px;box-shadow:0 1px 3px rgba(29,42,33,.18);transition:transform .35s cubic-bezier(.5,1.4,.5,1)}
 .tabs[data-mode=signup]::before{transform:translateX(100%)}
-.tabs button{position:relative;border:0;background:none;font:inherit;font-weight:600;font-size:.92rem;padding:10px;color:var(--soft);cursor:pointer;border-radius:9px;transition:color .25s}
+.tabs button{position:relative;border:0;background:none;font:inherit;font-weight:600;font-size:.92rem;padding:10px;color:var(--soft);cursor:pointer;border-radius:9px;transition:color .25s,scale .15s}
+.tabs button:active{scale:.94}
 .tabs button.on{color:var(--ink)}
 
 label{display:block;font-size:.85rem;font-weight:600;margin:14px 0 6px}
-input{width:100%;font:inherit;font-size:1rem;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;transition:border-color .2s,box-shadow .2s}
-input::placeholder{color:#9aa59c}
+input{width:100%;font:inherit;font-size:1rem;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;transition:border-color .2s,box-shadow .25s,translate .25s var(--e)}
+input::placeholder{color:#9aa59c;transition:opacity .25s,translate .25s}
+input:focus::placeholder{opacity:.4;translate:6px 0}
 input:hover{border-color:#b6c0b2}
-input:focus{outline:none;border-color:var(--r3);box-shadow:0 0 0 4px rgba(88,122,99,.18)}
-#nameBox:not([hidden]){animation:unfold .4s cubic-bezier(.2,.8,.2,1) both;transform-origin:top}
+input:focus{outline:none;border-color:var(--r3);box-shadow:0 0 0 4px rgba(88,122,99,.18);translate:0 -2px}
+.auth.bad input{border-color:#e3a9a4}
+#nameBox:not([hidden]){animation:unfold .4s var(--e) both;transform-origin:top}
 @keyframes unfold{from{opacity:0;transform:translateY(-8px) scaleY(.85)}to{opacity:1;transform:none}}
 .pwrow{position:relative}
 .pwrow input{padding-right:64px}
-.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;font:inherit;font-size:.82rem;font-weight:600;color:var(--soft);padding:8px 10px;border-radius:8px;cursor:pointer}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;font:inherit;font-size:.82rem;font-weight:600;color:var(--soft);padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .2s,color .2s}
 .eye:hover{color:var(--ink);background:#eef0e8}
+.eye.flip{animation:eyeflip .35s}
+@keyframes eyeflip{50%{transform:translateY(-50%) scaleY(0)}}
+
+/* password strength meter (signup only) */
+.meter{height:5px;border-radius:99px;background:#e3e7dc;overflow:hidden;max-height:0;margin-top:0;opacity:0;transition:max-height .4s var(--e),margin .4s var(--e),opacity .4s}
+.tabs[data-mode=signup]~.meter{max-height:5px;margin-top:10px;opacity:1}
+.meter i{display:block;height:100%;width:0;background:var(--c,#ccc);border-radius:inherit;transition:width .5s var(--e),background .4s}
 
 .btn{position:relative;width:100%;margin-top:22px;border:0;border-radius:12px;padding:14px;font:inherit;font-weight:600;font-size:1rem;color:#fff;background:var(--r1);cursor:pointer;overflow:hidden;transition:transform .15s,background .25s,box-shadow .25s;box-shadow:0 8px 18px -8px rgba(47,70,55,.7)}
+.auth>.btn{animation:fieldIn .6s var(--e) calc(.25s + var(--i,0)*60ms) backwards,ring 2.6s ease-in-out 1.5s infinite}
+@keyframes ring{0%,100%{box-shadow:0 8px 18px -8px rgba(47,70,55,.7),0 0 0 0 rgba(217,149,27,0)}50%{box-shadow:0 8px 18px -8px rgba(47,70,55,.7),0 0 0 8px rgba(217,149,27,.2)}}
 .btn::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-120%);transition:transform .6s}
 .btn:hover{background:var(--r2)}
 .btn:hover::after{transform:translateX(120%)}
@@ -54,6 +92,11 @@ input:focus{outline:none;border-color:var(--r3);box-shadow:0 0 0 4px rgba(88,122
 .btn.busy{pointer-events:none;color:transparent}
 .btn.busy::before{content:"";position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.btn.ok{background:#2e7d32;color:transparent;pointer-events:none}
+.btn.ok::before{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:1.4rem;animation:okpop .5s var(--e)}
+@keyframes okpop{from{transform:scale(0) rotate(-45deg)}to{transform:none}}
+.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:ripple .6s ease-out forwards;pointer-events:none}
+@keyframes ripple{to{transform:scale(3);opacity:0}}
 
 .msg{min-height:1.3em;margin:14px 0 0;font-size:.9rem;text-align:center}
 .msg.err{color:var(--err);animation:pop .35s ease}
@@ -62,17 +105,19 @@ input:focus{outline:none;border-color:var(--r3);box-shadow:0 0 0 4px rgba(88,122
 @keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
 
 @media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 </style></head><body>
 
+<div class="sun" aria-hidden="true"></div>
 <div class="strata" aria-hidden="true">
   <svg class="l1" viewBox="0 0 1600 300" preserveAspectRatio="none"><path fill="#587a63" d="M0 120 C200 60 400 180 800 120 S1400 60 1600 120 V300 H0Z"/></svg>
   <svg class="l2" viewBox="0 0 1600 300" preserveAspectRatio="none"><path fill="#3f5c49" d="M0 170 C250 110 450 230 800 170 S1350 110 1600 170 V300 H0Z"/></svg>
   <svg class="l3" viewBox="0 0 1600 300" preserveAspectRatio="none"><path fill="#2f4637" d="M0 220 C300 170 500 270 800 220 S1300 170 1600 220 V300 H0Z"/></svg>
 </div>
+<div class="sky" id="sky" aria-hidden="true"></div>
 
-<main class="wrap"><div class="auth" id="card">
+<main class="wrap"><div class="tilt" id="tilt"><div class="auth" id="card">
   <div class="brand">
     <svg class="seed" viewBox="0 0 28 28" fill="none" stroke="#d9951b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 25V13M14 13C14 7 9 4 4 4c0 6 3 9 10 9ZM14 16c0-4 3-7 10-7 0 5-3 7-10 7Z"/></svg>
     <b>Maati</b>
@@ -86,16 +131,51 @@ input:focus{outline:none;border-color:var(--r3);box-shadow:0 0 0 4px rgba(88,122
   <label for="email">Email</label><input id="email" type="email" autocomplete="email">
   <label for="pw">Password</label>
   <div class="pwrow"><input id="pw" type="password" autocomplete="current-password" placeholder="At least 8 characters"><button class="eye" id="eye" type="button" aria-label="Show password">Show</button></div>
+  <div class="meter" id="meter"><i id="mfill"></i></div>
   <button class="btn" id="go">Sign in</button>
   <p class="msg" id="m" role="alert"></p>
-</div></main>
+</div></div></main>
 
 <script src="/app.js"></script>
 <script>
 let mode="login";
 const COPY={login:["Welcome back","Sign in to pick up where you left off."],signup:["Join Maati","Create an account to save your cart and orders."]};
+const flip=el=>{el.classList.remove("swap");void el.offsetWidth;el.classList.add("swap")};
+function leaves(){
+  const sky=$("#sky"),cols=["#d9951b","#587a63","#3f5c49","#e8b24a"];
+  for(let i=0;i<18;i++){
+    const e=document.createElement("i");e.className="leaf";
+    e.style.cssText=`--l:${Math.random()*100}%;--s:${8+Math.random()*12}px;--c:${cols[i%4]};--d:${14+Math.random()*14}s;--dl:-${Math.random()*20}s;--dx:${Math.random()*160-80}px`;
+    sky.appendChild(e);
+  }
+}
+function strength(v){let s=0;if(v.length>=8)s++;if(v.length>=12)s++;if(/[a-z]/.test(v)&&/[A-Z]/.test(v))s++;if(/\d/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;return v?Math.max(1,s):0}
+
 function init(){
   if(user)location.href="/shop.html";
+
+  const card=$("#card"),tilt=$("#tilt");
+  [...card.children].forEach((c,i)=>c.style.setProperty("--i",i));
+  leaves();
+
+  /* 3D tilt + cursor spotlight */
+  if(!matchMedia("(prefers-reduced-motion:reduce)").matches){
+    addEventListener("pointermove",e=>{
+      const r=card.getBoundingClientRect();
+      card.style.setProperty("--mx",((e.clientX-r.left)/r.width*100)+"%");
+      card.style.setProperty("--my",((e.clientY-r.top)/r.height*100)+"%");
+      tilt.style.transform=`rotateY(${(e.clientX/innerWidth-.5)*6}deg) rotateX(${-(e.clientY/innerHeight-.5)*6}deg)`;
+    });
+    addEventListener("pointerleave",()=>tilt.style.transform="");
+  }
+
+  /* button ripple */
+  document.addEventListener("click",e=>{
+    const b=e.target.closest(".btn");if(!b)return;
+    const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height),s=document.createElement("span");
+    s.className="rip";s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;
+    b.appendChild(s);setTimeout(()=>s.remove(),650);
+  });
 
   const tabs=document.querySelector(".tabs");
   tabs.onclick=e=>{
@@ -106,20 +186,32 @@ function init(){
     $("#pw").autocomplete=m==="login"?"current-password":"new-password";
     $("#go").textContent=m==="login"?"Sign in":"Create account";
     $("#title").textContent=COPY[m][0];$("#sub").textContent=COPY[m][1];
-    $("#m").textContent="";$("#m").className="msg";
+    flip($("#title"));flip($("#sub"));
+    $("#m").textContent="";$("#m").className="msg";card.classList.remove("bad");
   };
 
   $("#eye").onclick=()=>{
-    const p=$("#pw"),show=p.type==="password";
+    const p=$("#pw"),show=p.type==="password",eye=$("#eye");
     p.type=show?"text":"password";
-    $("#eye").textContent=show?"Hide":"Show";
-    $("#eye").setAttribute("aria-label",show?"Hide password":"Show password");
+    eye.textContent=show?"Hide":"Show";
+    eye.setAttribute("aria-label",show?"Hide password":"Show password");
+    eye.classList.remove("flip");void eye.offsetWidth;eye.classList.add("flip");
   };
 
-  document.querySelectorAll("input").forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")$("#go").click()}));
+  /* password strength meter */
+  $("#pw").addEventListener("input",e=>{
+    const s=strength(e.target.value),f=$("#mfill");
+    f.style.width=s*20+"%";
+    f.style.setProperty("--c",["#ccc","#b3261e","#d9951b","#c0a02a","#6a9a4a","#2f7d4a"][s]);
+  });
+
+  document.querySelectorAll("input").forEach(i=>{
+    i.addEventListener("keydown",e=>{if(e.key==="Enter")$("#go").click()});
+    i.addEventListener("input",()=>card.classList.remove("bad"));
+  });
 
   $("#go").onclick=async()=>{
-    const m=$("#m"),btn=$("#go"),card=$("#card");m.className="msg";m.textContent="";
+    const m=$("#m"),btn=$("#go");m.className="msg";m.textContent="";
     const body={email:$("#email").value,password:$("#pw").value};
     if(mode==="signup")body.name=$("#name").value;
     btn.classList.add("busy");
@@ -128,10 +220,13 @@ function init(){
     btn.classList.remove("busy");
     if(!r.ok){
       m.className="msg err";m.textContent=r.data.error||"Something went wrong. Try again.";
+      card.classList.add("bad");
       card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake");
       return;
     }
-    location.href=new URLSearchParams(location.search).get("next")==="cart"?"/cart.html":"/shop.html";
+    btn.classList.add("ok");card.classList.add("leave");
+    const next=new URLSearchParams(location.search).get("next")==="cart"?"/cart.html":"/shop.html";
+    setTimeout(()=>location.href=next,650);
   };
 }
 </script>
