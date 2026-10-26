@@ -13,8 +13,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      
       - name: Deploy Maati
-        run: docker compose up -d --build
-
+        run: |
+          cd /opt/maati
+          echo "=== Current directory ==="
+          pwd
+          echo "=== Compose configuration ==="
+          docker compose config
+          echo "=== Deploying ==="
+          docker compose up -d --build --force-recreate
+          docker compose ps
 
 
